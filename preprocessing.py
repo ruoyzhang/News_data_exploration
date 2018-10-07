@@ -9,13 +9,10 @@ from multiprocessing import Pool
 import pickle
 import string
 
-
-class news_preprocessing:
+class news_preprocess:
 
 	def __init__(self, cores = 1):
 		self.cores = cores
-		print('The window size is ', str(self.window), ' days')
-		print('The periodical progression size is ', str(self.window), ' days')
 
 	def pre_process(self, df, content_col, timestamp_col, begin = None, end = None):
 		self.timestamp_col = timestamp_col
@@ -28,23 +25,23 @@ class news_preprocessing:
 		df = self.trim_df(df, content_col, timestamp_col, begin, end)
 
 		#parallelised tokenisation
-		if self.core == 1:
-			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is not None] for tk in tqdm(nlp.tokenizer(df[content_col]))]
+		if self.cores == 1:
+			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
 		else:
-			p = Pool(self.core, maxtasksperchild = 1)
+			p = Pool(self.cores, maxtasksperchild = 1)
 			toks = p.map(nlp.tokenizer, tqdm(df[content_col]))
 			p.close()
-			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is not None] for tk in tqdm(tks)]
+			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(tks)]
 
 		self.df = df
 		print('the dataframe is preprocessed successfully')
 
 	#trim the dataframe
-	def trim_df(df, content_col, timestamp_col, begin, end):
+	def trim_df(self, df, content_col, timestamp_col, begin, end):
 		if not isinstance(begin, datetime.datetime) and not isinstance(end, datetime.datetime):
-			begin = [datetime.datetime.strptime(str(date), '%Y%m%d') for date in [begin, end] if date != None and not isinstance(date, datetime.datetime)][0]
-			end = [datetime.datetime.strptime(str(date), '%Y%m%d') for date in [begin, end] if date != None and not isinstance(date, datetime.datetime)][1]
-		df = df[content_col, timestamp_col]
+			begin = [datetime.datetime.strptime(str(date), '%Y%m%d') if date != None and not isinstance(date, datetime.datetime) else None for date in [begin, end]][0]
+			end = [datetime.datetime.strptime(str(date), '%Y%m%d') if date != None and not isinstance(date, datetime.datetime) else None for date in [begin, end]][1]
+		df = df[[content_col, timestamp_col]]
 		if begin == end == None:
 			return(df)
 		elif begin == None:
@@ -54,7 +51,7 @@ class news_preprocessing:
 		else:
 			return(df[[begin <= day <= end for day in df[timestamp_col]]])
 
-	def cut_and_slide(self, window = 30, period = 7)
+	def cut_and_slide(self, window = 30, period = 7):
 
 		min_date = min(self.df[self.timestamp_col])
 		max_date = max(self.df[self.timestamp_col])
@@ -67,12 +64,14 @@ class news_preprocessing:
 			articles = self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col]
 			begin_dates.append(begin_date)
 			begin_date += datetime.timedelta(days = 7)
-			reparitioned_articles.append(articles)
+			repartitioned_articles.append(articles)
 		self.begin_dates = begin_dates
 		self.repartitioned_articles = repartitioned_articles
 		print('articles repartitioned, they can be accessed at self.reparitioned_articles')
 
 	def save_to_pickle(self, path):
 		with open(path, 'wb') as handle:
-			pickle.dump(self.reparitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
+			pickle.dump(self.repartitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
+
+
 
