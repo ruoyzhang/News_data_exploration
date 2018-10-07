@@ -12,19 +12,20 @@ import string
 
 class news_preprocessing:
 
-	def __init__(self, window = 30, period = 7, cores = 1):
-		self.window = window
-		self.period = period
+	def __init__(self, cores = 1):
 		self.cores = cores
 		print('The window size is ', str(self.window), ' days')
 		print('The periodical progression size is ', str(self.window), ' days')
 
 	def pre_process(self, df, content_col, timestamp_col, begin = None, end = None):
+		self.timestamp_col = timestamp_col
+		self.content_col = content_col
+
 		if set([isinstance(day, datetime.datetime) for day in df[timestamp_col]]) != {True}:
 			raise Exception('timestamp_col contains values that are not of the datetime type')
 
 		#trimming df
-		df = self.trim_df(df, begin, end, content_col, timestamp_col)
+		df = self.trim_df(df, content_col, timestamp_col, begin, end)
 
 		#parallelised tokenisation
 		if self.core == 1:
@@ -36,8 +37,13 @@ class news_preprocessing:
 			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is not None] for tk in tqdm(tks)]
 
 		self.df = df
+		print('the dataframe is preprocessed successfully')
 
-	def trim_df(df, begin, end, content_col, timestamp_col):
+	#trim the dataframe
+	def trim_df(df, content_col, timestamp_col, begin, end):
+		if not isinstance(begin, datetime.datetime) and not isinstance(end, datetime.datetime):
+			begin = [datetime.datetime.strptime(str(date), '%Y%m%d') for date in [begin, end] if date != None and not isinstance(date, datetime.datetime)][0]
+			end = [datetime.datetime.strptime(str(date), '%Y%m%d') for date in [begin, end] if date != None and not isinstance(date, datetime.datetime)][1]
 		df = df[content_col, timestamp_col]
 		if begin == end == None:
 			return(df)
@@ -48,5 +54,25 @@ class news_preprocessing:
 		else:
 			return(df[[begin <= day <= end for day in df[timestamp_col]]])
 
-	def
+	def cut_and_slide(self, window = 30, period = 7)
+
+		min_date = min(self.df[self.timestamp_col])
+		max_date = max(self.df[self.timestamp_col])
+
+		begin_date = min_date
+		repartitioned_articles = []
+		begin_dates = []
+
+		for i in tqdm(range(int((int((max_date - min_date).days) - window) / period))):
+			articles = self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col]
+			begin_dates.append(begin_date)
+			begin_date += datetime.timedelta(days = 7)
+			reparitioned_articles.append(articles)
+		self.begin_dates = begin_dates
+		self.repartitioned_articles = repartitioned_articles
+		print('articles repartitioned, they can be accessed at self.reparitioned_articles')
+
+	def save_to_pickle(self, path):
+		with open(path, 'wb') as handle:
+			pickle.dump(self.reparitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
