@@ -13,6 +13,8 @@ class news_preprocess:
 
 	def __init__(self, cores = 1):
 		self.cores = cores
+		self.spacy = __import__('spacy')
+
 
 	def pre_process(self, df, content_col, timestamp_col, begin = None, end = None):
 		self.timestamp_col = timestamp_col
@@ -28,10 +30,11 @@ class news_preprocess:
 		if self.cores == 1:
 			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
 		else:
+			nlp = self.spacy.load('en')
 			p = Pool(self.cores, maxtasksperchild = 1)
 			toks = p.map(nlp.tokenizer, tqdm(df[content_col]))
 			p.close()
-			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(tks)]
+			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(toks)]
 
 		self.df = df
 		print('the dataframe is preprocessed successfully')
