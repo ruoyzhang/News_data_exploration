@@ -67,7 +67,7 @@ class word2vec():
         return np.array(training_data)
 
 
-    # SOFTMAX ACTIVATION FUNCTION
+    # MODIFIED: SIGMOID ACTIVATION FUNCTION
     def softmax(self, x):
         e_x = np.exp(x - np.max(x))
         return e_x / e_x.sum(axis=0)
@@ -83,8 +83,8 @@ class word2vec():
 
     # FORWARD PASS
     def forward_pass(self, x):
-        h = np.dot(self.w1.T, x)
-        u = np.dot(self.w2.T, h)
+        h = np.dot(self.w1.T, x) #calculate the embedding matrix
+        u = np.dot(self.w2.T, h) #vector of doct product -- for the entire vocab
         y_c = self.softmax(u)
         return y_c, h, u
                 
