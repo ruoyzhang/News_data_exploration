@@ -31,11 +31,13 @@ class news_preprocess:
 		self.timestamp_col = timestamp_col
 		self.content_col = content_col
 
+		#loading df and converting to datetime format
+		df = pd.read_csv(data_dir)
+		df.date = [datetime.datetime.strptime(day, '%Y-%m-%d') for day in df.date]
+
 		if set([isinstance(day, datetime.datetime) for day in df[timestamp_col]]) != {True}:
 			raise Exception('timestamp_col contains values that are not of the datetime type')
 
-		#loading df
-		df = pd.read_csv(data_dir)
 		#trimming df
 		df = self.trim_df(df, content_col, timestamp_col, begin, end)
 
@@ -86,9 +88,9 @@ class news_preprocess:
 		print('articles repartitioned, they can be accessed at self.reparitioned_articles')
 
 	def save_to_pickle(self, path):
-		with open(path + 'preprocessed', 'wb') as handle:
+		with open(path + 'preprocessed.pickle', 'wb') as handle:
 			pickle.dump(self.repartitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
-		with open(path + 'begin_dates', 'wb') as handle:
+		with open(path + 'begin_dates.pickle', 'wb') as handle:
 			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
