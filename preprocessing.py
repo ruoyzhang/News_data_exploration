@@ -1,13 +1,24 @@
 import pandas as pd
-import numpy as np
 import re
-from collections import defaultdict
 import datetime
 from tqdm import tqdm
 import spacy
 from multiprocessing import Pool
 import pickle
-import string
+import argparse
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, default='../Data/corpus.csv', help="input data directory path")
+    parser.add_argument('--content_col', type=str, default='content', help="name of the column that contains the text content")
+    parser.add_argument('--timestamp_col', type=str, default='date', help="name of the column that contains the dates")
+    parser.add_argument('--cores', type=int, default=1, help="the number of cores used for multiprocessing")
+    parser.add_argument('--begin', type=str, default='20000101', help="the starting date")
+    parser.add_argument('--end', type=str, default='21000101', help="the ending date")
+    parser.add_argument('--window', type=int, default=30, help="sliding window size")
+    parser.add_argument('--period', type=int, default=7, help="sliding step size")
+    parser.add_argument('--save_dir', type=str, default='../Data/', help="output data directory folder path, please finish with a /")
+    return parser.parse_args()
 
 class news_preprocess:
 
@@ -16,13 +27,15 @@ class news_preprocess:
 		self.spacy = __import__('spacy')
 
 
-	def pre_process(self, df, content_col, timestamp_col, begin = None, end = None):
+	def pre_process(self, data_dir, content_col, timestamp_col, begin = None, end = None):
 		self.timestamp_col = timestamp_col
 		self.content_col = content_col
 
 		if set([isinstance(day, datetime.datetime) for day in df[timestamp_col]]) != {True}:
 			raise Exception('timestamp_col contains values that are not of the datetime type')
 
+		#loading df
+		df = pd.read_csv(data_dir)
 		#trimming df
 		df = self.trim_df(df, content_col, timestamp_col, begin, end)
 
@@ -64,7 +77,7 @@ class news_preprocess:
 		begin_dates = []
 
 		for i in tqdm(range(int((int((max_date - min_date).days) - window) / period))):
-			articles = self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col]
+			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
 			begin_date += datetime.timedelta(days = 7)
 			repartitioned_articles.append(articles)
@@ -73,8 +86,15 @@ class news_preprocess:
 		print('articles repartitioned, they can be accessed at self.reparitioned_articles')
 
 	def save_to_pickle(self, path):
-		with open(path, 'wb') as handle:
+		with open(path + 'preprocessed', 'wb') as handle:
 			pickle.dump(self.repartitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
+		with open(path + 'begin_dates', 'wb') as handle:
+			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
-
+if __name__ == '__main__':
+    args = parse_args()
+    preprocess = news_preprocess(cores = args.cores)
+    preprocess.preprocess(data_dir = argparse.data_dir, content_col = argparse.content_col, timestamp_col = argparse.timestamp_col, begin = argparse.begin, end = argparse.end)
+    preprocess.cut_and_slide(window = argparse.window, period = argparse.period)
+    preprocess.save_to_pickle(args.save_dir)
 
