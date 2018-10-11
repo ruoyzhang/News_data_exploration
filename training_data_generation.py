@@ -1,4 +1,10 @@
-# -*- coding: utf-8 -*-
+#----------------------------------------------------------------------------------------------------------------------
+# Author: Ruoyang Zhang
+# Please note that the code below is adapted from the original code published on github by Jamie J Seol (@theeluwin)
+# the original code can be found via the link below
+# https://github.com/theeluwin/pytorch-sgns/blob/master/preprocess.py
+#----------------------------------------------------------------------------------------------------------------------
+
 
 import os
 import pickle
@@ -38,6 +44,7 @@ class Preprocess(object):
         self.wc = {self.unk: 1}
         with open(filepath, 'rb') as handle:
             file = pickle.load(handle)
+            file = [day for sublist in l for item in sublist]
             for line in file:
                 step += 1
                 # count till step == 1000 (when step = 1000, step % 1000 = 0 and not step % 1000 == True)
