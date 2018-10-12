@@ -30,6 +30,7 @@ def parse_args():
 
 
 class PermutedSubsampledCorpus(Dataset):
+    # performs subsampling if desired
 
     def __init__(self, datapath, ws=None):
         data = pickle.load(open(datapath, 'rb'))
@@ -73,6 +74,7 @@ def train(args):
         optim.load_state_dict(t.load(optimpath))
     for epoch in range(1, args.epoch + 1):
         dataset = PermutedSubsampledCorpus(os.path.join(args.data_dir, 'train.dat'))
+        #dataloader converts input numpy data into long tensors
         dataloader = DataLoader(dataset, batch_size=args.mb, shuffle=True)
         total_batches = int(np.ceil(len(dataset) / args.mb))
         pbar = tqdm(dataloader)

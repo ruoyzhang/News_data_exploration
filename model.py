@@ -33,7 +33,7 @@ class Word2Vec(Bundler):
         # define parameters with initial weights: 0 for the padding and uniformly sampled weights for the vocab
         self.ivectors.weight = nn.Parameter(t.cat([t.zeros(1, self.embedding_size), FT(self.vocab_size - 1, self.embedding_size).uniform_(-0.5 / self.embedding_size, 0.5 / self.embedding_size)]))
         self.ovectors.weight = nn.Parameter(t.cat([t.zeros(1, self.embedding_size), FT(self.vocab_size - 1, self.embedding_size).uniform_(-0.5 / self.embedding_size, 0.5 / self.embedding_size)]))
-        # indicates that we do not exclude this as it is the main part of the graph
+        # indicates that we do not exclude this as it is the main part of the graph - this should be treated as parameters
         self.ivectors.weight.requires_grad = True
         self.ovectors.weight.requires_grad = True
 
@@ -75,6 +75,8 @@ class SGNS(nn.Module):
         ivectors = self.embedding.forward_i(iword).unsqueeze(2)
         ovectors = self.embedding.forward_o(owords)
         nvectors = self.embedding.forward_o(nwords).neg()
+        ## this is the line we need to modify: add the euclidean distance as a regularisation term
+        ## we will also consider the consine similarity
         oloss = t.bmm(ovectors, ivectors).squeeze().sigmoid().log().mean(1)
         nloss = t.bmm(nvectors, ivectors).squeeze().sigmoid().log().view(-1, context_size, self.n_negs).sum(2).mean(1)
         return -(oloss + nloss).mean()
