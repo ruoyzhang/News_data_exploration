@@ -69,6 +69,7 @@ class SGNS(nn.Module):
         batch_size = iword.size()[0]
         context_size = owords.size()[1]
         if self.weights is not None:
+            # sampling negative words, per batch we have context_size * self.n_negs number of negative words
             nwords = t.multinomial(self.weights, batch_size * context_size * self.n_negs, replacement=True).view(batch_size, -1)
         else:
             nwords = FT(batch_size, context_size * self.n_negs).uniform_(0, self.vocab_size - 1).long()
