@@ -3,6 +3,7 @@
 import numpy as np
 import torch as t
 import torch.nn as nn
+import pickle
 
 from torch import LongTensor as LT
 from torch import FloatTensor as FT
@@ -37,12 +38,16 @@ class Word2Vec(Bundler):
         self.ivectors.weight.requires_grad = True
         self.ovectors.weight.requires_grad = True
 
+    def load_idx2word(self, idx_dir):
+        with open(idx_dir, 'rb') as handle:
+            self.idx2word = pickle.load(idx_dir)
+
+
     def forward(self, data):
         return self.forward_i(data)
 
     def forward_i(self, data):
         v = LT(data)
-        # ???
         v = v.cuda() if self.ivectors.weight.is_cuda else v
         return self.ivectors(v)
 
@@ -54,7 +59,7 @@ class Word2Vec(Bundler):
 
 class SGNS(nn.Module):
 
-    def __init__(self, embedding, vocab_size=20000, n_negs=20, weights=None):
+    def __init__(self, embedding, vocab_size=20000, n_negs=20, weights=None, previous_model = None):
         super(SGNS, self).__init__()
         self.embedding = embedding
         self.vocab_size = vocab_size
@@ -64,8 +69,9 @@ class SGNS(nn.Module):
             wf = np.power(weights, 0.75)
             wf = wf / wf.sum()
             self.weights = FT(wf)
+        self.previous_model = previous_model
 
-    def forward(self, iword, owords):
+    def forward(self, iword, owords, rwords_dict = None):
         batch_size = iword.size()[0]
         context_size = owords.size()[1]
         if self.weights is not None:
@@ -76,8 +82,16 @@ class SGNS(nn.Module):
         ivectors = self.embedding.forward_i(iword).unsqueeze(2)
         ovectors = self.embedding.forward_o(owords)
         nvectors = self.embedding.forward_o(nwords).neg()
-        ## this is the line we need to modify: add the euclidean distance as a regularisation term
-        ## we will also consider the consine similarity
         oloss = t.bmm(ovectors, ivectors).squeeze().sigmoid().log().mean(1)
         nloss = t.bmm(nvectors, ivectors).squeeze().sigmoid().log().view(-1, context_size, self.n_negs).sum(2).mean(1)
-        return -(oloss + nloss).mean()
+
+        rwords_dict = None if self.previous_model = None else rwords_dict
+        
+        if rwords_dict is not None:
+            rwords = LT(list(sorted(rword_dict.keys())))
+            rvectors = self.embedding.forward_i(rwords)
+            MSE_loss_fun = nn.MSELoss(reduction = 'sum')
+            total_r_loss = sum([MSE_loss_fun(rvectors[rvectors[i]], self.previous_model.ivectors.weight[rwords_dict[rword[i]]]) for i in range(len(rwords))])
+            return(-(oloss + nloss).mean() + total_r_loss)
+        else:
+            return -(oloss + nloss).mean()
