@@ -72,7 +72,7 @@ class SGNS(nn.Module):
         self.previous_model = previous_model
         self.previous_model.requires_grad = False
 
-    def forward(self, iword, owords, rwords_dict = None):
+    def forward(self, iword, owords, rwords_dict):
         batch_size = iword.size()[0]
         context_size = owords.size()[1]
         if self.weights is not None:

@@ -50,15 +50,16 @@ class PermutedSubsampledCorpus(Dataset):
         return iword, np.array(owords)
 
 
-def train(name, data_dir_0, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda):
-    word2idx_0 = pickle.load(open(os.path.join(data_dir_0, 'word2idx.dat'), 'rb'))
+def train(name, data_dir_0 = None, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda):
 
     idx2word_1 = pickle.load(open(os.path.join(data_dir_1, 'idx2word.dat'), 'rb'))
     word2idx_1 = pickle.load(open(os.path.join(data_dir_1, 'word2idx.dat'), 'rb'))
 
     #creating idx2idx dict for the overlapping section of the vocabularies
-    vocab_inters = set(word2idx_0.keys())&set(word2idx_1.keys())
-    idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
+    if data_dir_0 is not None:
+        word2idx_0 = pickle.load(open(os.path.join(data_dir_0, 'word2idx.dat'), 'rb'))
+        vocab_inters = set(word2idx_0.keys())&set(word2idx_1.keys())
+        idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
 
     wc = pickle.load(open(os.path.join(data_dir_1, 'wc.dat'), 'rb'))
     wf = np.array([wc[word] for word in idx2word1])
@@ -91,12 +92,12 @@ def train(name, data_dir_0, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t
             if cuda:
                 iword = iword.cuda()
                 owords = owords.cuda()
-            # here we need to create a idx2idx dict
-            vocab_present = set(list(set(iword.cpu().numpy()))&set(idx2idx.keys()))
-            if len(vocab_present) == 0:
-                rwords_dict = None
-            else:
+            if data_dir_0 is not None and len(vocab_present) != 0:
+                # here we need to create a idx2idx dict
+                vocab_present = set(list(set(iword.cpu().numpy()))&set(idx2idx.keys()))
                 rwords_dict = {word:idx2idx[word] for word in vocab_present}
+            else:
+                rwords_dict = None
             loss = sgns(iword, owords, rwords_dict)
             optim.zero_grad()
             loss.backward()
