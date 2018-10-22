@@ -56,7 +56,7 @@ def train(name, data_dir_0, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t
     idx2word_1 = pickle.load(open(os.path.join(data_dir_1, 'idx2word.dat'), 'rb'))
     word2idx_1 = pickle.load(open(os.path.join(data_dir_1, 'word2idx.dat'), 'rb'))
 
-    #creating idx2idx dict
+    #creating idx2idx dict for the overlapping section of the vocabularies
     vocab_inters = set(word2idx_0.keys())&set(word2idx_1.keys())
     idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
 
@@ -88,8 +88,11 @@ def train(name, data_dir_0, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t
         pbar = tqdm(dataloader)
         pbar.set_description("[Epoch {}]".format(epoch))
         for iword, owords in pbar:
+            if cuda:
+                iword = iword.cuda()
+                owords = owords.cuda()
             # here we need to create a idx2idx dict
-            vocab_present = list(set(iword.cpu().numpy())&set(idx2idx.keys()))
+            vocab_present = set(list(set(iword.cpu().numpy()))&set(idx2idx.keys()))
             if len(vocab_present) == 0:
                 rwords_dict = None
             else:
