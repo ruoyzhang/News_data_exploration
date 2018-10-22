@@ -50,7 +50,7 @@ class PermutedSubsampledCorpus(Dataset):
         return iword, np.array(owords)
 
 
-def train(name, data_dir_0 = None, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda):
+def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda, data_dir_0 = None):
 
     idx2word_1 = pickle.load(open(os.path.join(data_dir_1, 'idx2word.dat'), 'rb'))
     word2idx_1 = pickle.load(open(os.path.join(data_dir_1, 'word2idx.dat'), 'rb'))
