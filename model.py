@@ -96,4 +96,4 @@ class SGNS(nn.Module):
             total_r_loss = sum([MSE_loss_fun(rvectors[rvectors[i]], self.previous_model.ivectors.weight[rwords_dict[rword[i]]]) for i in range(len(rwords))])
             return(-(oloss + nloss).mean() + total_r_loss)
         else:
-            return(-(loss + nloss).mean())
+            return(-(oloss + nloss).mean())
