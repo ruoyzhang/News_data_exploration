@@ -62,11 +62,11 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
         idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
 
     wc = pickle.load(open(os.path.join(data_dir_1, 'wc.dat'), 'rb'))
-    wf = np.array([wc[word] for word in idx2word1])
+    wf = np.array([wc[word] for word in idx2word_1])
     wf = wf / wf.sum()
     ws = 1 - np.sqrt(ss_t / wf)
     ws = np.clip(ws, 0, 1)
-    vocab_size = len(idx2word1)
+    vocab_size = len(idx2word_1)
     weights = wf if weights else None
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
