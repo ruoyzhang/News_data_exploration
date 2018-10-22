@@ -86,7 +86,7 @@ class SGNS(nn.Module):
         oloss = t.bmm(ovectors, ivectors).squeeze().sigmoid().log().mean(1)
         nloss = t.bmm(nvectors, ivectors).squeeze().sigmoid().log().view(-1, context_size, self.n_negs).sum(2).mean(1)
 
-        rwords_dict = None if self.previous_model = None else rwords_dict
+        rwords_dict = None if self.previous_model is None else rwords_dict
         
         if rwords_dict is not None:
             rwords = LT(list(sorted(rword_dict.keys())))
