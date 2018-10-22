@@ -3,7 +3,7 @@
 import os
 import pickle
 import random
-import argparse
+# import argparse
 import torch as t
 import numpy as np
 
@@ -13,20 +13,20 @@ from torch.utils.data import Dataset, DataLoader
 from model import Word2Vec, SGNS
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--name', type=str, default='sgns', help="model name")
-    parser.add_argument('--data_dir', type=str, default='./data/', help="data directory path")
-    parser.add_argument('--save_dir', type=str, default='./pts/', help="model directory path")
-    parser.add_argument('--e_dim', type=int, default=300, help="embedding dimension")
-    parser.add_argument('--n_negs', type=int, default=20, help="number of negative samples")
-    parser.add_argument('--epoch', type=int, default=100, help="number of epochs")
-    parser.add_argument('--mb', type=int, default=4096, help="mini-batch size")
-    parser.add_argument('--ss_t', type=float, default=1e-5, help="subsample threshold")
-    parser.add_argument('--conti', action='store_true', help="continue learning")
-    parser.add_argument('--weights', action='store_true', help="use weights for negative sampling")
-    parser.add_argument('--cuda', action='store_true', help="use CUDA")
-    return parser.parse_args()
+# def parse_args():
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('--name', type=str, default='sgns', help="model name")
+#     parser.add_argument('--data_dir', type=str, default='./data/', help="data directory path")
+#     parser.add_argument('--save_dir', type=str, default='./pts/', help="model directory path")
+#     parser.add_argument('--e_dim', type=int, default=300, help="embedding dimension")
+#     parser.add_argument('--n_negs', type=int, default=20, help="number of negative samples")
+#     parser.add_argument('--epoch', type=int, default=100, help="number of epochs")
+#     parser.add_argument('--mb', type=int, default=4096, help="mini-batch size")
+#     parser.add_argument('--ss_t', type=float, default=1e-5, help="subsample threshold")
+#     parser.add_argument('--conti', action='store_true', help="continue learning")
+#     parser.add_argument('--weights', action='store_true', help="use weights for negative sampling")
+#     parser.add_argument('--cuda', action='store_true', help="use CUDA")
+#     return parser.parse_args()
 
 
 class PermutedSubsampledCorpus(Dataset):
@@ -50,45 +50,62 @@ class PermutedSubsampledCorpus(Dataset):
         return iword, np.array(owords)
 
 
-def train(args):
-    idx2word = pickle.load(open(os.path.join(args.data_dir, 'idx2word.dat'), 'rb'))
-    wc = pickle.load(open(os.path.join(args.data_dir, 'wc.dat'), 'rb'))
-    wf = np.array([wc[word] for word in idx2word])
+def train(name, data_dir_0, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda):
+    word2idx_0 = pickle.load(open(os.path.join(data_dir_0, 'word2idx.dat'), 'rb'))
+
+    idx2word_1 = pickle.load(open(os.path.join(data_dir_1, 'idx2word.dat'), 'rb'))
+    word2idx_1 = pickle.load(open(os.path.join(data_dir_1, 'word2idx.dat'), 'rb'))
+
+    #creating idx2idx dict for the overlapping section of the vocabularies
+    vocab_inters = set(word2idx_0.keys())&set(word2idx_1.keys())
+    idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
+
+    wc = pickle.load(open(os.path.join(data_dir_1, 'wc.dat'), 'rb'))
+    wf = np.array([wc[word] for word in idx2word1])
     wf = wf / wf.sum()
-    ws = 1 - np.sqrt(args.ss_t / wf)
+    ws = 1 - np.sqrt(ss_t / wf)
     ws = np.clip(ws, 0, 1)
-    vocab_size = len(idx2word)
-    weights = wf if args.weights else None
-    if not os.path.isdir(args.save_dir):
-        os.mkdir(args.save_dir)
-    model = Word2Vec(vocab_size=vocab_size, embedding_size=args.e_dim)
-    modelpath = os.path.join(args.save_dir, '{}.pt'.format(args.name))
-    sgns = SGNS(embedding=model, vocab_size=vocab_size, n_negs=args.n_negs, weights=weights)
-    if os.path.isfile(modelpath) and args.conti:
+    vocab_size = len(idx2word1)
+    weights = wf if weights else None
+    if not os.path.isdir(save_dir):
+        os.mkdir(save_dir)
+    model = Word2Vec(vocab_size=vocab_size, embedding_size=e_dim)
+    modelpath = os.path.join(save_dir, '{}.pt'.format(name))
+    sgns = SGNS(embedding=model, vocab_size=vocab_size, n_negs=n_negs, weights=weights)
+    if os.path.isfile(modelpath) and conti:
         sgns.load_state_dict(t.load(modelpath))
-    if args.cuda:
+    if cuda:
         sgns = sgns.cuda()
     optim = Adam(sgns.parameters())
-    optimpath = os.path.join(args.save_dir, '{}.optim.pt'.format(args.name))
-    if os.path.isfile(optimpath) and args.conti:
+    optimpath = os.path.join(save_dir, '{}.optim.pt'.format(name))
+    if os.path.isfile(optimpath) and conti:
         optim.load_state_dict(t.load(optimpath))
-    for epoch in range(1, args.epoch + 1):
-        dataset = PermutedSubsampledCorpus(os.path.join(args.data_dir, 'train.dat'))
+    for epoch in range(1, epoch + 1):
+        dataset = PermutedSubsampledCorpus(os.path.join(data_dir_1, 'train.dat'))
         #dataloader converts input numpy data into long tensors
-        dataloader = DataLoader(dataset, batch_size=args.mb, shuffle=True)
-        total_batches = int(np.ceil(len(dataset) / args.mb))
+        dataloader = DataLoader(dataset, batch_size=mb, shuffle=True)
+        total_batches = int(np.ceil(len(dataset) / mb))
         pbar = tqdm(dataloader)
         pbar.set_description("[Epoch {}]".format(epoch))
         for iword, owords in pbar:
-            loss = sgns(iword, owords)
+            if cuda:
+                iword = iword.cuda()
+                owords = owords.cuda()
+            # here we need to create a idx2idx dict
+            vocab_present = set(list(set(iword.cpu().numpy()))&set(idx2idx.keys()))
+            if len(vocab_present) == 0:
+                rwords_dict = None
+            else:
+                rwords_dict = {word:idx2idx[word] for word in vocab_present}
+            loss = sgns(iword, owords, rwords_dict)
             optim.zero_grad()
             loss.backward()
             optim.step()
             pbar.set_postfix(loss=loss.item())
     idx2vec = model.ivectors.weight.data.cpu().numpy()
-    pickle.dump(idx2vec, open(os.path.join(args.data_dir, 'idx2vec.dat'), 'wb'))
-    t.save(sgns.state_dict(), os.path.join(args.save_dir, '{}.pt'.format(args.name)))
-    t.save(optim.state_dict(), os.path.join(args.save_dir, '{}.optim.pt'.format(args.name)))
+    pickle.dump(idx2vec, open(os.path.join(data_dir_1, 'idx2vec.dat'), 'wb'))
+    t.save(sgns.state_dict(), os.path.join(save_dir, '{}.pt'.format(args.name)))
+    t.save(optim.state_dict(), os.path.join(save_dir, '{}.optim.pt'.format(args.name)))
 
 
 if __name__ == '__main__':
