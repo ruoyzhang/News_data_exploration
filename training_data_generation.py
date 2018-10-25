@@ -44,7 +44,7 @@ class Preprocess(object):
         self.wc = {self.unk: 1}
         with open(filepath, 'rb') as handle:
             file = pickle.load(handle)
-            file = [day for sublist in file for item in sublist]
+            file = [item for sublist in file for item in sublist]
             for line in file:
                 step += 1
                 # count till step == 1000 (when step = 1000, step % 1000 = 0 and not step % 1000 == True)
