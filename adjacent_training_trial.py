@@ -6,8 +6,8 @@ from model import SGNS
 
 
 name = 'period1'
-data_dir_1 = 'home/paperspace/projects/news_exploration/Data/training_data/period1/'
-data_dir_0 = 'home/paperspace/projects/news_exploration/Data/training_data/period0/'
+data_dir_1 = '/home/paperspace/projects/news_exploration/Data/training_data/period1/'
+data_dir_0 = '/home/paperspace/projects/news_exploration/Data/training_data/period0/'
 save_dir = data_dir_1
 e_dim = 300
 n_negs = 40

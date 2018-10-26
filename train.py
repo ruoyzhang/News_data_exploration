@@ -92,7 +92,7 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
             # if cuda:
             #     iword = iword.cuda()
             #     owords = owords.cuda()
-            vocab_present = set(list(set(iword.cpu().numpy()))&set(idx2idx.keys()))
+            vocab_present = list(set(iword.cpu().numpy())&set(idx2idx.keys()))
             if data_dir_0 is not None and len(vocab_present) != 0:
                 # here we need to create a idx2idx dict
                 rwords_dict = {word:idx2idx[word] for word in vocab_present}
