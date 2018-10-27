@@ -69,7 +69,8 @@ class SGNS(nn.Module):
             wf = np.power(weights, 0.75)
             wf = wf / wf.sum()
             self.weights = FT(wf)
-        self.previous_model = t.from_numpy(previous_model).cuda() if self.embedding.ivectors.weight.is_cuda else t.from_numpy(previous_model)
+        self.previous_model = t.from_numpy(previous_model).cuda()
+        print(self.previous_model.type())
 
     def forward(self, iword, owords, rwords_dict):
         batch_size = iword.size()[0]
