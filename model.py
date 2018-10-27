@@ -69,7 +69,7 @@ class SGNS(nn.Module):
             wf = np.power(weights, 0.75)
             wf = wf / wf.sum()
             self.weights = FT(wf)
-        self.previous_model = previous_model
+        self.previous_model = t.from_numpy(previous_model)
 
     def forward(self, iword, owords, rwords_dict):
         batch_size = iword.size()[0]
@@ -89,7 +89,7 @@ class SGNS(nn.Module):
         
         if rwords_dict is not None:
             rwords = list(sorted(rwords_dict.keys()))
-            print(rwords)
+            #print(rwords)
             print(rwords_dict[rwords[0]])
             rvectors = self.embedding.forward_i(rwords)
             MSE_loss_fun = nn.MSELoss(reduction = 'sum')
