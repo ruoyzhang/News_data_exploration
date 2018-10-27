@@ -60,6 +60,8 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
         word2idx_0 = pickle.load(open(os.path.join(data_dir_0, 'word2idx.dat'), 'rb'))
         vocab_inters = set(word2idx_0.keys())&set(word2idx_1.keys())
         idx2idx = {word2idx_1[word]: word2idx_0[word] for word in vocab_inters}
+        with open(data_dir_0 +'idx2vec.dat', 'rb') as handle:
+            previous_model = pickle.load(handle)
 
     wc = pickle.load(open(os.path.join(data_dir_1, 'wc.dat'), 'rb'))
     wf = np.array([wc[word] for word in idx2word_1])
@@ -72,7 +74,7 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
         os.mkdir(save_dir)
     model = Word2Vec(vocab_size=vocab_size, embedding_size=e_dim)
     modelpath = os.path.join(save_dir, '{}.pt'.format(name))
-    sgns = SGNS(embedding=model, vocab_size=vocab_size, n_negs=n_negs, weights=weights)
+    sgns = SGNS(embedding=model, vocab_size=vocab_size, n_negs=n_negs, weights=weights, previous_model = previous_model)
     if os.path.isfile(modelpath) and conti:
         sgns.load_state_dict(t.load(modelpath))
     if cuda:
