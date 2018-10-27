@@ -94,9 +94,9 @@ class SGNS(nn.Module):
             print(rwords_dict[rwords[0]])
             rvectors = self.embedding.forward_i(rwords)
             MSE_loss_fun = nn.MSELoss(reduction = 'sum')
-            print(rvectors[rwords[0]].shape)
+            print(rvectors[rwords[561]].shape)
             print('--------------------')
-            print(rvectors[rwords[0]].shape)
+            print(self.previous_model[rwords_dict[rwords[561]]].shape)
             total_r_loss = sum([MSE_loss_fun(rvectors[rwords[i]], self.previous_model[rwords_dict[rwords[i]]]) for i in range(len(rwords))])
             return(-(oloss + nloss).mean() + 5*total_r_loss)
         else:
