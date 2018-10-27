@@ -90,6 +90,7 @@ class SGNS(nn.Module):
         rwords_dict = None if self.previous_model is None else rwords_dict
         
         if rwords_dict is not None:
+            print('rwords passed to loss')
             rwords = LT(list(sorted(rword_dict.keys())))
             rvectors = self.embedding.forward_i(rwords)
             MSE_loss_fun = nn.MSELoss(reduction = 'sum')
