@@ -90,11 +90,9 @@ class SGNS(nn.Module):
         
         if rwords_dict is not None:
             rwords = list(sorted(rwords_dict.keys()))
-            #print(rwords)
             rvectors = self.embedding.forward_i(rwords)
             MSE_loss_fun = nn.MSELoss(reduction = 'sum')
             total_r_loss = sum([MSE_loss_fun(rvectors[i], self.previous_model[rwords_dict[rwords[i]]]) for i in range(len(rwords))])
-            print(-(oloss + nloss).mean(), 0.001*total_r_loss)
             return(-(oloss + nloss).mean() + 0.001*total_r_loss)
         else:
             return(-(oloss + nloss).mean())
