@@ -18,6 +18,13 @@ conti = False
 weights = True
 cuda = True
 
+train(name = name, data_dir_1 = data_dir_0, save_dir = data_dir_0,
+      e_dim = e_dim, n_negs = n_negs, epoch = epoch, mb = mb,
+      ss_t = ss_t, conti = conti, weights = weights, cuda = cuda, data_dir_0 = None)
+
+print('first period training terminated')
+
+
 train(name = name, data_dir_1 = data_dir_1, save_dir = save_dir,
       e_dim = e_dim, n_negs = n_negs, epoch = epoch, mb = mb,
       ss_t = ss_t, conti = conti, weights = weights, cuda = cuda, data_dir_0 = data_dir_0)
