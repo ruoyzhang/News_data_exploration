@@ -4,7 +4,7 @@ from train import train
 
 
 data_dir = '../Data/'
-window = 3
+window = 1
 stride = 1
 begin_date = 20150901
 end_date = 20150908
