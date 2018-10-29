@@ -83,23 +83,26 @@ class news_preprocess:
 		max_date = max(self.df[self.timestamp_col])
 
 		begin_date = min_date
-		repartitioned_articles = []
+		#repartitioned_articles = []
 		begin_dates = []
 
 		for i in tqdm(range(int((int((max_date - min_date).days) - window) / period))):
 			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
 			begin_date += datetime.timedelta(days = 7)
-			repartitioned_articles.append(articles)
+			with open(path + 'preprocessed_' + str(i) + '.pickle', 'wb') as handle:
+	 			pickle.dump(articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		self.begin_dates = begin_dates
-		self.repartitioned_articles = repartitioned_articles
-		print('articles repartitioned, they can be accessed at self.reparitioned_articles')
-
-	def save_to_pickle(self, path):
-		with open(path + 'preprocessed.pickle', 'wb') as handle:
-			pickle.dump(self.repartitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		with open(path + 'begin_dates.pickle', 'wb') as handle:
 			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
+		#self.repartitioned_articles = repartitioned_articles
+		print('articles repartitioned and saved')
+
+	# def save_to_pickle(self, path):
+	# 	with open(path + 'preprocessed.pickle', 'wb') as handle:
+	# 		pickle.dump(self.repartitioned_articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
+	# 	with open(path + 'begin_dates.pickle', 'wb') as handle:
+	# 		pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
     args = parse_args()

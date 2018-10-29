@@ -16,7 +16,7 @@ prepro.pre_process(data_dir + 'signal.csv', 'content', 'published', begin = begi
 
 prepro.cut_and_slide(window,stride)
 
-prepro.save_to_pickle(data_path+'signal_')
+#prepro.save_to_pickle(data_path+'signal_')
 
 
 #------------------ building training date --------------------
