@@ -43,13 +43,13 @@ class news_preprocess:
 
 		#parallelised tokenisation
 		if self.cores == 1:
-			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
+			df[content_col] = [[str(word).lower() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
 		else:
 			nlp = self.spacy.load('en')
 			p = Pool(self.cores, maxtasksperchild = 1)
 			toks = p.map(nlp.tokenizer, tqdm(df[content_col]))
 			p.close()
-			df[content_col] = [[str(word) for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(toks)]
+			df[content_col] = [[str(word).lower() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(toks)]
 
 		self.df = df
 		print('the dataframe is preprocessed successfully')
