@@ -10,7 +10,7 @@ end_date = 20150909
 
 #------------------ preprocessing --------------------
 
-prepro = news_preprocess(cores = 3)
+prepro = news_preprocess(cores = 2)
 
 prepro.pre_process(data_dir + 'signal.csv', 'content', 'published', begin = begin_date, end = end_date)
 
