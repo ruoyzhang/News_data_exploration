@@ -43,6 +43,7 @@ class news_preprocess:
 
 		#trimming df
 		df = self.trim_df(df, content_col, timestamp_col, begin, end)
+		#df[content_col] = [re.sub(r'\W+', '', article).split(' ') for article in df[content_col]]
 
 		#parallelised tokenisation
 		if self.cores == 1:
