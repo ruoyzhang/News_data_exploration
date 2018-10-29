@@ -84,10 +84,10 @@ class news_preprocess:
 			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
 			begin_date += datetime.timedelta(days = 7)
-			with open(path + 'preprocessed_' + str(i) + '.pickle', 'wb') as handle:
+			with open(data_dir + 'articles_preprocessed_' + str(i) + '.pickle', 'wb') as handle:
 	 			pickle.dump(articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		self.begin_dates = begin_dates
-		with open(path + 'begin_dates.pickle', 'wb') as handle:
+		with open(data_dir + 'articles_begin_dates.pickle', 'wb') as handle:
 			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		#self.repartitioned_articles = repartitioned_articles
 		print('articles repartitioned and saved')
