@@ -6,7 +6,7 @@ data_dir = '../Data/'
 window = 7
 stride = 1
 begin_date = 20150901
-end_date = 20151001
+end_date = 20150915
 
 #------------------ preprocessing --------------------
 
