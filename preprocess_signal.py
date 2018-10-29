@@ -45,7 +45,7 @@ cuda = True
 for i in range(5):
 	name = 'period' + str(i)
 	data_dir_1 = '/home/paperspace/projects/news_exploration/Data/training_data/period' + str(i) + '/'
-	if i > 0
+	if i > 0:
 		data_dir_0 = '/home/paperspace/projects/news_exploration/Data/training_data/period' + str(i-1) + '/'
 	else:
 		data_dir_0 = None
