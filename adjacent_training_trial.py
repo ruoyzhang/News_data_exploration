@@ -24,6 +24,7 @@ train(name = name, data_dir_1 = data_dir_0, save_dir = data_dir_0,
 
 print('first period training terminated')
 
+epoch = 5
 
 train(name = name, data_dir_1 = data_dir_1, save_dir = save_dir,
       e_dim = e_dim, n_negs = n_negs, epoch = epoch, mb = mb,

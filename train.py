@@ -63,8 +63,8 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
         if data_dir_0 is not None:
             with open(data_dir_0 +'idx2vec.dat', 'rb') as handle:
                 previous_model = pickle.load(handle)
-        else:
-            previous_model = None
+    else:
+        previous_model = None
 
     wc = pickle.load(open(os.path.join(data_dir_1, 'wc.dat'), 'rb'))
     wf = np.array([wc[word] for word in idx2word_1])
