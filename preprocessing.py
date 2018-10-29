@@ -26,7 +26,6 @@ def parse_args():
 class news_preprocess:
 
 	def __init__(self, cores = 1):
-		self.cores = cores
 		self.spacy = __import__('spacy')
 
 
@@ -43,17 +42,11 @@ class news_preprocess:
 
 		#trimming df
 		df = self.trim_df(df, content_col, timestamp_col, begin, end)
-		#df[content_col] = [re.sub(r'\W+', '', article).split(' ') for article in df[content_col]]
+		df[content_col] = [re.sub(r'\W+', ' ', article).split(' ') for article in df[content_col]]
 
 		#parallelised tokenisation
-		if self.cores == 1:
-			df[content_col] = [[str(word).lower() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
-		else:
-			nlp = self.spacy.load('en')
-			p = Pool(self.cores, maxtasksperchild = 1)
-			toks = p.map(nlp.tokenizer, tqdm(df[content_col]))
-			p.close()
-			df[content_col] = [[str(word).lower() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(toks)]
+		#df[content_col] = [[str(word).lower().strip() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(self.nlp.tokenizer(df[content_col]))]
+		df[content_col] = [[str(word).lower().strip() for word in list(tk) if re.match('[\W_]+$', str(word)) is None and len(str(word).lower().strip()) > 0] for tk in tqdm(df[content_col])]
 
 		print('training for and detecting bigrams')
 		phrases = phrases = Phrases(df[content_col], min_count=10, threshold=100)
