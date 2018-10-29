@@ -25,7 +25,7 @@ def parse_args():
 
 class news_preprocess:
 
-	def __init__(self, cores = 1):
+	def __init__(self):
 		self.spacy = __import__('spacy')
 
 
