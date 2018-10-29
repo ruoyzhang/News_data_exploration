@@ -6,6 +6,9 @@ import spacy
 from multiprocessing import Pool
 import pickle
 import argparse
+from gensim.test.utils import datapath
+from gensim.models.word2vec import Text8Corpus
+from gensim.models.phrases import Phrases, Phraser
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -33,7 +36,7 @@ class news_preprocess:
 
 		#loading df and converting to datetime format
 		df = pd.read_csv(data_dir)
-		df.date = [datetime.datetime.strptime(day, '%Y-%m-%d') for day in df.date]
+		df[timestamp_col] = [datetime.datetime.strptime(day, '%Y-%m-%d') for day in df[timestamp_col]]
 
 		if set([isinstance(day, datetime.datetime) for day in df[timestamp_col]]) != {True}:
 			raise Exception('timestamp_col contains values that are not of the datetime type')
@@ -50,6 +53,11 @@ class news_preprocess:
 			toks = p.map(nlp.tokenizer, tqdm(df[content_col]))
 			p.close()
 			df[content_col] = [[str(word).lower() for word in list(tk) if re.match('[\W_]+$', str(word)) is None] for tk in tqdm(toks)]
+
+		print('training for and detecting bigrams')
+		phrases = phrases = Phrases(df[content_col], min_count=10, threshold=100)
+		bigram = Phraser(phrases)
+		df[content_col] = [bigram[article] for article in tqdm(df[content_col])]
 
 		self.df = df
 		print('the dataframe is preprocessed successfully')
