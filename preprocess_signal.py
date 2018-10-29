@@ -3,10 +3,10 @@ from training_data_generation import Preprocess
 
 
 data_dir = '../Data/'
-window = 7
+window = 3
 stride = 1
 begin_date = 20150901
-end_date = 20150915
+end_date = 20150909
 
 #------------------ preprocessing --------------------
 
