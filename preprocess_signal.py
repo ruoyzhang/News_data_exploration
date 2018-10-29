@@ -1,10 +1,6 @@
 from preprocessing import news_preprocess
 from training_data_generation import Preprocess
-import numpy as np
-import pickle
-import os
 from train import train
-from model import SGNS
 
 
 data_dir = '../Data/'
@@ -19,7 +15,7 @@ prepro = news_preprocess()
 
 prepro.pre_process(data_dir + 'signal.csv', 'content', 'published', begin = begin_date, end = end_date)
 
-prepro.cut_and_slide(window,stride)
+prepro.cut_and_slide(data_dir, window, stride)
 
 
 #------------------ building training data --------------------

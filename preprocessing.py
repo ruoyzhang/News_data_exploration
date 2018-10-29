@@ -32,7 +32,6 @@ class news_preprocess:
 	def pre_process(self, data_dir, content_col, timestamp_col, begin = None, end = None):
 		self.timestamp_col = timestamp_col
 		self.content_col = content_col
-		self.data_dir = data_dir
 
 		#loading df and converting to datetime format
 		df = pd.read_csv(data_dir)
@@ -72,7 +71,7 @@ class news_preprocess:
 		else:
 			return(df[[begin <= day <= end for day in df[timestamp_col]]])
 
-	def cut_and_slide(self, window = 30, period = 7):
+	def cut_and_slide(self, data_dir, window = 30, period = 7):
 
 		min_date = min(self.df[self.timestamp_col])
 		max_date = max(self.df[self.timestamp_col])
@@ -85,10 +84,10 @@ class news_preprocess:
 			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
 			begin_date += datetime.timedelta(days = 7)
-			with open(self.data_dir + 'articles_preprocessed_' + str(i) + '.pickle', 'wb') as handle:
+			with open(data_dir + 'articles_preprocessed_' + str(i) + '.pickle', 'wb') as handle:
 	 			pickle.dump(articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		self.begin_dates = begin_dates
-		with open(self.data_dir + 'articles_begin_dates.pickle', 'wb') as handle:
+		with open(data_dir + 'articles_begin_dates.pickle', 'wb') as handle:
 			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		#self.repartitioned_articles = repartitioned_articles
 		print('articles repartitioned and saved')
