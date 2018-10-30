@@ -19,7 +19,7 @@ prepro.cut_and_slide(data_dir, window, stride)
 
 
 #------------------ building training data --------------------
-for i in range(4):
+for i in range(3):
 	inp_data_path = '../Data/articles_preprocessed_' + str(i) + '.pickle'
 	res_data_path = '../Data/training_data/period'+str(i)+'/'
 	preprocess = Preprocess(window=5, data_dir=res_data_path)
@@ -38,7 +38,7 @@ conti = False
 weights = True
 cuda = True
 
-for i in range(4):
+for i in range(3):
 	name = 'period' + str(i)
 	data_dir_1 = '/home/paperspace/projects/news_exploration/Data/training_data/period' + str(i) + '/'
 	if i > 0:
