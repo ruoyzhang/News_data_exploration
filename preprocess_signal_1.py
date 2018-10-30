@@ -7,9 +7,9 @@ data_dir = '../Data/'
 window = 1
 stride = 1
 begin_date = 20150901
-end_date = 20150905
+end_date = 20150904
 
-#------------------ preprocessing --------------------
+# ------------------ preprocessing --------------------
 
 # prepro = news_preprocess()
 
@@ -26,7 +26,7 @@ end_date = 20150905
 # 	preprocess.build(inp_data_path, 30000)
 # 	preprocess.convert(inp_data_path)
 
-#------------------ adjacent training --------------------
+# ------------------ adjacent training --------------------
 
 # global vars
 e_dim = 300
