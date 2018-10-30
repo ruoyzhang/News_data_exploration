@@ -83,7 +83,7 @@ class news_preprocess:
 		for i in tqdm(range(int((int((max_date - min_date).days) - window) / period))):
 			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
-			begin_date += datetime.timedelta(days = 7)
+			begin_date += datetime.timedelta(days = period)
 			with open(data_dir + 'articles_preprocessed_' + str(i) + '.pickle', 'wb') as handle:
 	 			pickle.dump(articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
 		self.begin_dates = begin_dates
