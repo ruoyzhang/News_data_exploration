@@ -15,11 +15,11 @@ prepro = news_preprocess()
 
 prepro.pre_process(data_dir + 'signal.csv', 'content', 'published', begin = begin_date, end = end_date)
 
-prepro.cut_and_slide(data_dir, window, stride)
+prepro.cut_and_slide(data_dir = data_dir, window = window, period = stride)
 
 
 #------------------ building training data --------------------
-for i in range(3):
+for i in range(4):
 	inp_data_path = '../Data/articles_preprocessed_' + str(i) + '.pickle'
 	res_data_path = '../Data/training_data/period'+str(i)+'/'
 	preprocess = Preprocess(window=5, data_dir=res_data_path)

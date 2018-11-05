@@ -86,6 +86,7 @@ class news_preprocess:
 			begin_date += datetime.timedelta(days = period)
 			with open(data_dir + 'articles_preprocessed_' + str(i) + '.pickle', 'wb') as handle:
 	 			pickle.dump(articles, handle, protocol = pickle.HIGHEST_PROTOCOL)
+	 		print('preprocessing finished for period '+str(i) + ', it has been saved')
 		self.begin_dates = begin_dates
 		with open(data_dir + 'articles_begin_dates.pickle', 'wb') as handle:
 			pickle.dump(self.begin_dates, handle, protocol = pickle.HIGHEST_PROTOCOL)
