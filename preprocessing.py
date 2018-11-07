@@ -80,6 +80,7 @@ class news_preprocess:
 		#repartitioned_articles = []
 		begin_dates = []
 
+		print('there are ', (max_date - min_date).days, 'days')
 		for i in tqdm(range(int((int((max_date - min_date).days) - window + 1) / period))):
 			articles = list(self.df[[begin_date <= day < begin_date + datetime.timedelta(days = window) for day in self.df[self.timestamp_col]]][self.content_col])
 			begin_dates.append(begin_date)
