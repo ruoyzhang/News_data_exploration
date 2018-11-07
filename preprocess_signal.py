@@ -4,7 +4,7 @@ from train import train
 
 
 data_dir = '../Data/'
-window = 1
+window = 2
 stride = 1
 begin_date = 20160621
 end_date = 20160625
@@ -19,7 +19,7 @@ prepro.cut_and_slide(data_dir = data_dir, window = window, period = stride)
 
 
 #------------------ building training data --------------------
-for i in range(3):
+for i in range(4):
 	inp_data_path = '../Data/articles_preprocessed_' + str(i) + '.pickle'
 	res_data_path = '../Data/training_data/period'+str(i)+'/'
 	preprocess = Preprocess(window=5, data_dir=res_data_path)
@@ -31,7 +31,7 @@ for i in range(3):
 # global vars
 e_dim = 300
 n_negs = 40
-epoch = 3
+epoch = 20
 mb = 1024
 ss_t = 1e-5
 conti = False
