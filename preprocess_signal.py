@@ -22,7 +22,7 @@ prepro.cut_and_slide(data_dir = data_dir, window = window, period = stride)
 for i in range(4):
 	inp_data_path = '../Data/articles_preprocessed_' + str(i) + '.pickle'
 	res_data_path = '../Data/training_data/period'+str(i)+'/'
-	preprocess = Preprocess(window=5, data_dir=res_data_path)
+	preprocess = Preprocess(window=10, data_dir=res_data_path)
 	preprocess.build(inp_data_path, 30000)
 	preprocess.convert(inp_data_path)
 
