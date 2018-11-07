@@ -13,7 +13,7 @@ end_date = 20150625
 
 prepro = news_preprocess()
 
-prepro.pre_process(data_dir + 'all-the-news/articles_all.csv', 'content', 'published', begin = begin_date, end = end_date)
+prepro.pre_process(data_dir + 'all-the-news/articles_all.csv', 'content', 'date', begin = begin_date, end = end_date)
 
 prepro.cut_and_slide(data_dir = data_dir, window = window, period = stride)
 
