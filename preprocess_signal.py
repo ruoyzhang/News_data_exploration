@@ -31,7 +31,7 @@ for i in range(4):
 # global vars
 e_dim = 300
 n_negs = 40
-epoch = 30
+epoch = 60
 mb = 1024
 ss_t = 1e-5
 conti = False
