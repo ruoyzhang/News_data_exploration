@@ -25,4 +25,4 @@ class similar_words:
 		else:
 			idx_sim_dict = {i:1-spatial.distance.cosine(self.idx2vec[idx],vec) for i,vec in enumerate(self.idx2vec) if i not in [0,idx]}
 		idx_sim_dict = sorted(idx_sim_dict.items(), key=lambda kv: kv[1], reverse=True)
-		self.neighbours = [(self.idx2word[pair[0]], pair[1]) for pair in idx_sim_dict[:20]]
+		self.neighbours = [(self.idx2word[pair[0]], pair[1]) for pair in idx_sim_dict[:n]]
