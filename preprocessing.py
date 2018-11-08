@@ -29,7 +29,7 @@ class news_preprocess:
 		self.spacy = __import__('spacy')
 
 
-	def pre_process(self, data_dir, content_col, timestamp_col, begin = None, end = None):
+	def pre_process(self, data_dir, content_col, timestamp_col, bigram_mincount = 1, bigram_treshold = 20, begin = None, end = None):
 		self.timestamp_col = timestamp_col
 		self.content_col = content_col
 
