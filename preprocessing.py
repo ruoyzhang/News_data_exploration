@@ -49,7 +49,7 @@ class news_preprocess:
 		df[content_col] = [[str(word).lower().strip() for word in list(tk) if re.match('[\W_]+$', str(word)) is None and len(str(word).lower().strip()) > 0] for tk in tqdm(df[content_col])]
 
 		print('training for and detecting bigrams')
-		phrases = phrases = Phrases(df[content_col], min_count=1, threshold=50)
+		phrases = phrases = Phrases(df[content_col], min_count=1, threshold=20)
 		bigram = Phraser(phrases)
 		df[content_col] = [bigram[article] for article in tqdm(df[content_col])]
 
