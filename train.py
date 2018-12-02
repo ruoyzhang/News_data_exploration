@@ -3,30 +3,26 @@
 import os
 import pickle
 import random
-# import argparse
 import torch as t
 import numpy as np
-
 from tqdm import tqdm
 from torch.optim import Adam
 from torch.utils.data import Dataset, DataLoader
 from model import Word2Vec, SGNS
 
-
-# def parse_args():
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--name', type=str, default='sgns', help="model name")
-#     parser.add_argument('--data_dir', type=str, default='./data/', help="data directory path")
-#     parser.add_argument('--save_dir', type=str, default='./pts/', help="model directory path")
-#     parser.add_argument('--e_dim', type=int, default=300, help="embedding dimension")
-#     parser.add_argument('--n_negs', type=int, default=20, help="number of negative samples")
-#     parser.add_argument('--epoch', type=int, default=100, help="number of epochs")
-#     parser.add_argument('--mb', type=int, default=4096, help="mini-batch size")
-#     parser.add_argument('--ss_t', type=float, default=1e-5, help="subsample threshold")
-#     parser.add_argument('--conti', action='store_true', help="continue learning")
-#     parser.add_argument('--weights', action='store_true', help="use weights for negative sampling")
-#     parser.add_argument('--cuda', action='store_true', help="use CUDA")
-#     return parser.parse_args()
+# ------------------------------ Variable Definition ------------------------------
+# name: name of result file to be saved
+# data_dir_1: directory to the current period's data
+# save_dir: where to save the result
+# e_dim: number of dimensions of the embeddings
+# n_negs: number of negative words to sample
+# epoch: number of epochs
+# mb: batch size
+# ss_t: threshold used for subsampling on the vocab
+# conti: boolean, whether we're starting from scratch or continuing from a previous training session
+# weights: boolean, whether to use weights for negative sampling. If True, then we use the unigram distribution raised to the power of 3/4
+# cuda: whether to use GPU for training, the current version only works with cude = True
+# data_dir_0: where the previous period's data is stored, 'None' by default
 
 
 class PermutedSubsampledCorpus(Dataset):
@@ -50,7 +46,7 @@ class PermutedSubsampledCorpus(Dataset):
         return iword, np.array(owords)
 
 
-def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda, data_dir_0 = None):
+def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, weights, cuda = True, data_dir_0 = None):
 
     idx2word_1 = pickle.load(open(os.path.join(data_dir_1, 'idx2word.dat'), 'rb'))
     word2idx_1 = pickle.load(open(os.path.join(data_dir_1, 'word2idx.dat'), 'rb'))
@@ -94,9 +90,6 @@ def train(name, data_dir_1, save_dir, e_dim, n_negs, epoch, mb, ss_t, conti, wei
         pbar = tqdm(dataloader)
         pbar.set_description("[Epoch {}]".format(epoch))
         for iword, owords in pbar:
-            # if cuda:
-            #     iword = iword.cuda()
-            #     owords = owords.cuda()
             if data_dir_0 is not None:
                 # here we need to create a idx2idx dict
                 vocab_present = list(set(iword.cpu().numpy())&set(idx2idx.keys()))

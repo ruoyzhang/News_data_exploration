@@ -73,7 +73,6 @@ class SGNS(nn.Module):
             self.previous_model = t.from_numpy(previous_model).cuda()
         else:
             self.previous_model = None
-        #print(self.previous_model.type())
 
     def forward(self, iword, owords, rwords_dict):
         batch_size = iword.size()[0]
