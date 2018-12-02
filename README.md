@@ -10,7 +10,5 @@ The aim of the project is to provide a tool for training temporally aligned word
 - neighbourhood.py
 
 
-#### Example codes can be found at: preprocess_signal.py
+#### Example codes of how to run the scripts can be found at: preprocess_signal.py
 https://github.com/ruoyzhang/temporally_aligned_W2V/blob/master/preprocess_signal.py
-
-#### Example of visualisation coming soon
